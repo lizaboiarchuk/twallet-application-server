@@ -1,4 +1,5 @@
 import json
+from enum import Enum
 
 import pymongo
 
@@ -7,6 +8,11 @@ client = pymongo.MongoClient(
 
 db = client["tWallet"]
 users_collection = db["users"]
+
+
+class MoneyType(Enum):
+    Incomes = "incomes"
+    Outcomes = "outcomes"
 
 
 class Outcomes:
@@ -53,11 +59,11 @@ async def add_outcomes_item(user_id, category, sum, date, name):
     users_collection.update({"user_id": user_id}, {"$push": {"outcomes": outcomes.__dict__}})
 
 
-async def add_incomes_item(user_id, date,sum, name):
+async def add_incomes_item(user_id, date, sum, name):
     incomes = Incomes(date, sum, name)
     users_collection.update({"user_id": user_id}, {"$push": {"incomes": incomes.__dict__}})
 
 
-async def get_outcomes_items(user_id):
+async def get_items(user_id, flag: MoneyType):
     outcomes = users_collection.find_one({"user_id": user_id})
-    return outcomes["outcomes"]
+    return outcomes[flag.value]
