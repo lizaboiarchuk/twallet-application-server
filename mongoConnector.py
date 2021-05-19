@@ -1,4 +1,3 @@
-import json
 from enum import Enum
 
 import pymongo
@@ -57,13 +56,24 @@ async def contains_user(user_id):
 async def add_outcomes_item(user_id, category, sum, date, name):
     outcomes = Outcomes(date, category, sum, name)
     users_collection.update({"user_id": user_id}, {"$push": {"outcomes": outcomes.__dict__}})
+    balance = await get_user_balance(user_id)
+    balance -= sum
+    users_collection.update({"user_id":user_id}, {"$set": {"balance": balance}})
 
 
 async def add_incomes_item(user_id, date, sum, name):
     incomes = Incomes(date, sum, name)
     users_collection.update({"user_id": user_id}, {"$push": {"incomes": incomes.__dict__}})
+    balance = await get_user_balance(user_id)
+    balance += sum
+    users_collection.update({"user_id": user_id}, {"$set": {"balance": balance}})
 
 
 async def get_items(user_id, flag: MoneyType):
     outcomes = users_collection.find_one({"user_id": user_id})
     return outcomes[flag.value]
+
+
+async def get_user_balance(user_id):
+    user = users_collection.find_one({"user_id": user_id})
+    return user["balance"]

@@ -1,5 +1,5 @@
 from aiohttp import web
-from mongoConnector import add_new_user, add_outcomes_item, add_incomes_item, get_items, MoneyType
+from mongoConnector import add_new_user, add_outcomes_item, add_incomes_item, get_items, MoneyType, get_user_balance
 import json
 
 routes = web.RouteTableDef()
@@ -40,11 +40,19 @@ async def get_outcomes(request: web.Request):
     return web.json_response(result)
 
 
+# accept 'user_id', return array of incomes
 @routes.get('/incomes')
 async def get_incomes(request: web.Request):
     data = await request.json()
     result = await get_items(data["user_id"], MoneyType.Incomes)
     return web.json_response(result)
+
+
+@routes.get('/balance')
+async def get_balance(request: web.Request):
+    data = await request.json()
+    balance = await get_user_balance(data["user_id"])
+    return web.json_response(balance)
 
 app = web.Application()
 app.add_routes(routes)
