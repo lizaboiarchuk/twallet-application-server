@@ -69,7 +69,8 @@ async def add_incomes_item(user_id, date, sum, name, currency):
     incomes = Incomes(date, sum, name, currency)
     users_collection.update({"user_id": user_id}, {"$push": {"incomes": incomes.__dict__}})
     balance = await get_user_balance(user_id)
-    balance += exchange(sum, int(currency))
+    new_sum = await exchange(sum, int(currency))
+    balance += int(new_sum)
     users_collection.update({"user_id": user_id}, {"$set": {"balance": balance}})
 
 
