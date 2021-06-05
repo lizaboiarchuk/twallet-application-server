@@ -61,7 +61,8 @@ async def add_outcomes_item(user_id, category, sum, date, name, currency):
     outcomes = Outcomes(date, category, sum, name, currency)
     users_collection.update({"user_id": user_id}, {"$push": {"outcomes": outcomes.__dict__}})
     balance = await get_user_balance(user_id)
-    balance -= sum
+    new_sum = await exchange(sum, int(currency))
+    balance -= int(new_sum)
     users_collection.update({"user_id":user_id}, {"$set": {"balance": balance}})
 
 

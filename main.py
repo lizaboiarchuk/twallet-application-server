@@ -30,6 +30,7 @@ async def add_outcomes(request: web.Request):
 @routes.post('/incomes')
 async def add_incomes(request: web.Request):
     data = await request.json()
+    print(data)
     await add_incomes_item(data["user_id"], data["date"], data["sum"], data["name"], data["currency"])
     return web.Response(status=200)
 
