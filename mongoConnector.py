@@ -58,6 +58,7 @@ async def contains_user(user_id):
 
 
 async def add_outcomes_item(user_id, category, sum, date, name, currency):
+    sum = await exchange(sum, currency)
     outcomes = Outcomes(date, category, sum, name, currency)
     users_collection.update({"user_id": user_id}, {"$push": {"outcomes": outcomes.__dict__}})
     balance = await get_user_balance(user_id)
@@ -67,6 +68,7 @@ async def add_outcomes_item(user_id, category, sum, date, name, currency):
 
 
 async def add_incomes_item(user_id, date, sum, name, currency):
+    sum = exchange(sum, currency)
     incomes = Incomes(date, sum, name, currency)
     users_collection.update({"user_id": user_id}, {"$push": {"incomes": incomes.__dict__}})
     balance = await get_user_balance(user_id)
